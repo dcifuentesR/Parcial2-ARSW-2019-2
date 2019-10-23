@@ -32,9 +32,30 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <script src="/webjars/sockjs-client/sockjs.min.js"></script>
 <script src="/webjars/stomp-websocket/stomp.min.js"></script>
 <script src="/app.js"></script>
+<script src="/AirportsFinderModule.js"></script>
 
 </head>
+<body>
+<div class="topnav">
+		<label >City</label> <input id=city type="text">
+		<button type="button"
+			onClick="app.updateAirportList($('#city').val())">Get
+			airports</button>
+	</div>
+	<table id="airports" style="width: 100%">
+		<thead>
+			<tr>
+				<th>Code</th>
+				<th>Name</th>
+				<th>City</th>
+				<th>Country Code</th>
+			</tr>
+		</thead>
+		<tbody id=airportTableBody>
+		</tbody>
+	</table>
 
+</body>
 
 
 <!--     <body onLoad="app.init()"> -->

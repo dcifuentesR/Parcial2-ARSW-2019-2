@@ -1,5 +1,8 @@
 package edu.eci.arsw.airportfinder.persistence;
 
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.stereotype.Service;
@@ -18,14 +21,26 @@ public class AirportFinderCache implements AirportsPersistence{
 		
 		Airport alondon = new Airport("LCY", "London City", "London", "GB");
 		airports.put(alondon.getName(), alondon);
+		
+		Airport alondon2 = new Airport("LCY", "London City", "London", "GB");
+		airports.put(alondon2.getName(), alondon2);
+		System.out.print(airports.entrySet());
 	}
 
 	@Override
-	public Airport getAirportByName(String airportName) throws Exception{
-		Airport a =airports.get(airportName);
-		if(a!=null)
-			return a;
-		else throw new Exception("could not find airport"+airportName);
+	public Set<Airport> getAirportsByName(String airportName) throws Exception{
+		Set<Airport> airportsResponse = new HashSet<Airport>();
+        for (Map.Entry<String,Airport> entry : airports.entrySet()) {
+            if(entry.getKey().equals(airportName)){
+                airportsResponse.add(entry.getValue());
+            }
+        }
+        if(airportsResponse.isEmpty()){
+            throw new Exception("Could not find city "+airportName);
+        }
+        else{
+            return airportsResponse;
+        }
 	}
 
 }

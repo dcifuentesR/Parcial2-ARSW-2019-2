@@ -11,17 +11,17 @@ import org.springframework.web.bind.annotation.RestController;
 import edu.eci.arsw.airportfinder.services.AirportFinderServices;
 
 @RestController
-@RequestMapping(value="/airports")
+@RequestMapping(value="/cities")
 public class AirportsFinderController {
 	
 	@Autowired
 	private AirportFinderServices afs;
 	
-	@RequestMapping(path = "/{airportName}", method = RequestMethod.GET)
-	public ResponseEntity<?> getAirportsByName(@PathVariable("airportName") String airportName){
+	@RequestMapping(path = "/{cityName}", method = RequestMethod.GET)
+	public ResponseEntity<?> getAirportsByName(@PathVariable("cityName") String cityName){
 		
 		try {
-			return new ResponseEntity<>(afs.getAirportByName(airportName), HttpStatus.ACCEPTED);
+			return new ResponseEntity<>(afs.getAirportsByName(cityName), HttpStatus.ACCEPTED);
 		} catch (Exception e) {
 			return new ResponseEntity<>(e.getMessage(),HttpStatus.NOT_FOUND);
 		}

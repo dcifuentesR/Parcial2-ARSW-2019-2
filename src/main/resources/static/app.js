@@ -1,36 +1,9 @@
 var app = (function () {
-
-    class Point{
-        constructor(x,y){
-            this.x=x;
-            this.y=y;
-        }        
-    }
     
     var stompClient = null;
+    var selectedCity=null;
+    var selectedCityAirports=null;
 
-    var addPointToCanvas = function (point) {        
-        var canvas = document.getElementById("canvas");
-        var ctx = canvas.getContext("2d");
-        ctx.beginPath();
-        ctx.arc(point.x, point.y, 3, 0, 2 * Math.PI);
-        ctx.stroke();
-    };
-    
-    var addPolygonToCanvas = function(polygon){
-    	var canvas = document.getElementById("canvas");
-    	var ctx = canvas.getContext("2d");
-    	ctx.fillStyle = "#f00"
-    	ctx.beginPath();
-    	ctx.moveTo(polygon.points[0].x,polygon.points[0].y);
-    	polygon.points.forEach(function(currentPoint){
-    		ctx.lineTo(currentPoint.x,currentPoint.y);
-    	});
-    	ctx.closePath();
-    	ctx.fill();
-    	ctx.stroke();
-    };
-    
     var getMousePosition = function (evt) {
         canvas = document.getElementById("canvas");
         var rect = canvas.getBoundingClientRect();
@@ -39,34 +12,43 @@ var app = (function () {
             y: evt.clientY - rect.top
         };
     };
-
-
-    var connectAndSubscribe = function (canvasId) {
-        console.info('Connecting to WS...');
-        var socket = new SockJS('/stompendpoint');
-        stompClient = Stomp.over(socket);
-        
-        //subscribe to /topic/TOPICXX when connections succeed
-        stompClient.connect({}, function (frame) {
-            console.log('Connected: ' + frame);
-            stompClient.subscribe('/topic/newpoint.'+canvasId, function (eventbody) {
-                
-                var jsObject=JSON.parse(eventbody.body);
-                var pt=new Point(jsObject.x,jsObject.y);
-                console.info("recieved point at "+JSON.stringify(pt));
-                addPointToCanvas(pt);
-                
-            });
-            
-            stompClient.subscribe('/topic/newpolygon.'+canvasId,function(eventbody){
-            	var jsObject = JSON.parse(eventbody.body);
-            	console.info("created new polygon!");
-            	addPolygonToCanvas(jsObject);
-            });
-        });
-
-    };
     
+    var searchAirports = function(city){
+    	AirportsFinderModule.getAirportsByName(city,function(error,airports){
+    		if(error){
+					return console.log("could not find the airport");
+				}else{
+					selectedCity=city;
+					selectedCityAirports=airports;
+					
+				}
+    	})
+    }
+    
+    var updateAirportList = function(city){
+    	airportTable = $("#airportTableBody");
+    	airportTable.empty();
+    	
+		searchAirports(city);
+		selectedCityAirports.forEach(function(currentAirport){
+			var tr,td;
+			
+			airportTable.append(tr = document.createElement("tr"));
+			tr.appendChild(td =document.createElement("td"));
+			td.innerHTML=currentAirport.code;
+			tr.appendChild(td = document.createElement("td"));
+			td.innerHTML=currentAirport.name;
+			tr.appendChild(td = document.createElement("td"));
+			td.innerHTML=currentAirport.city;
+			tr.appendChild(td = document.createElement("td"));
+			td.innerHTML=currentAirport.countryCode;
+			
+		});
+		
+		airportTable.append();
+		
+		
+    }    
     
 
     return {
@@ -83,24 +65,8 @@ var app = (function () {
             //websocket connection
             //connectAndSubscribe();
         },
-
-        publishPoint: function(px,py,canvasId){
-            var pt=new Point(px,py);
-            console.info("publishing point at "+JSON.stringify(pt));
-            
-            stompClient.send("/app/newpoint."+canvasId,{},JSON.stringify(pt));
-
-            //publicar el evento
-        },
-
-        disconnect: function () {
-            if (stompClient !== null) {
-                stompClient.disconnect();
-            }
-            setConnected(false);
-            console.log("Disconnected");
-        },
-        connectAndSubscribe:connectAndSubscribe
+    
+    updateAirportList:updateAirportList
     };
 
 })();
