@@ -1,8 +1,8 @@
-package edu.eci.arsw.airportfinder.services;
+package edu.eci.arsw.airportfinder.persistence;
 
 import edu.eci.arsw.airportfinder.model.Airport;
 
-public interface AirportFinderServices {
+public interface AirportsPersistence {
 	
 	public Airport getAirportByName(String airportName) throws Exception;
 
