@@ -14,6 +14,9 @@ public class AFServices implements AirportFinderServices {
 	
 	@Autowired
 	private AirportsPersistence ap;
+	
+	@Autowired
+	private HttpConnectionServices httpCS;
 
 	public Set<Airport> getAirportsByName(String airportName) throws Exception{
 		return ap.getAirportsByName(airportName);

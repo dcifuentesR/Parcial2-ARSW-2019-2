@@ -7,38 +7,22 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import org.springframework.stereotype.Service;
+
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.Unirest;
+import com.mashape.unirest.http.exceptions.UnirestException;
+
+@Service
 public class HTTPCServices implements HttpConnectionServices {
 	
-	public static String getJson(String url) throws MalformedURLException, IOException {
-        
-        String USER_AGENT = "Mozilla/5.0";        
-        URL obj = new URL(url);
-            
-        HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-        con.setRequestMethod("GET");
-        con.setRequestProperty("User-Agent", USER_AGENT);
-        con.setRequestProperty("x-rapidapi-key", "db253e919fmsh78cff1da749d5d7p1d5ad8jsn214907c6b254");
-        int responseCode = con.getResponseCode();
-        System.out.println("GET Response Code :: " + responseCode);
-        
-        if (responseCode == HttpURLConnection.HTTP_OK) { // success
-            BufferedReader in = new BufferedReader(new InputStreamReader(
-                    con.getInputStream()));
-            String inputLine;
-            StringBuffer response = new StringBuffer();
+	public HttpResponse<String> getAirportsByName(String name) throws UnirestException {
 
-            while ((inputLine = in.readLine()) != null) {
-                response.append(inputLine);
-            }
-            in.close();
+        return Unirest.get("https://cometari-airportsfinder-v1.p.rapidapi.com/api/airports/by-text?text=" + name)
+                .header("x-rapidapi-host", "cometari-airportsfinder-v1.p.rapidapi.com")
+                .header("x-rapidapi-key", "3407fc8ec4msh92a7a491f6cfa03p18fee7jsn32c7feb653f1")
+                .asString();
 
-            // print result
-            System.out.println(response.toString());
-        } else {
-            System.out.println("GET request not worked");
-        }
-        System.out.println("GET DONE");
-        return "";
     }
 
 }
