@@ -4,14 +4,43 @@ var app = (function () {
     var selectedCity=null;
     var selectedCityAirports=null;
 
-    var getMousePosition = function (evt) {
-        canvas = document.getElementById("canvas");
-        var rect = canvas.getBoundingClientRect();
-        return {
-            x: evt.clientX - rect.left,
-            y: evt.clientY - rect.top
-        };
-    };
+    var map;
+
+    var initMap = function()
+    {
+      map = new google.maps.Map(document.getElementById('map'), {
+        center: {lat: -34.397, lng: 150.644},
+        zoom: 8
+      });
+      console.log(map);
+
+//      fetch('https://raw.githubusercontent.com/jayshields/google-maps-api-template/master/markers.json')
+//        .then(function(response){return response.json()})
+//        .then(plotMarkers);
+    }
+    
+    var plotMarkers =function (m)
+    {
+      markers = [];
+      bounds = new google.maps.LatLngBounds();
+
+      m.forEach(function (marker) {
+        var position = new google.maps.LatLng(marker.lat, marker.lng);
+
+        markers.push(
+          new google.maps.Marker({
+            position: position,
+            map: map,
+            animation: google.maps.Animation.DROP
+          })
+        );
+
+        bounds.extend(position);
+      });
+
+      map.fitBounds(bounds);
+    }
+    
     
     var searchAirports = function(city){
     	AirportsFinderModule.getAirportsByName(city,function(error,airports){
@@ -19,7 +48,15 @@ var app = (function () {
 					return console.log("could not find the airport");
 				}else{
 					selectedCity=city;
-					selectedCityAirports=airports;
+					selectedCityAirports=JSON.parse(airports);
+					var markers =[];
+					selectedCityAirports.forEach(function(currentAirport){
+						markers.push({
+							lat: currentAirport.location.latitude,
+							lng: currentAirport.location.longitude
+						});
+					});
+					plotMarkers(markers);
 					
 				}
     	})
@@ -54,16 +91,21 @@ var app = (function () {
     return {
 
         init: function () {
-            var can = document.getElementById("canvas");
-            
-            if(window.PointerEvent){
-            	can.addEventListener("pointerdown",function(event){
-            		var point = getMousePosition(event);
-            		app.publishPoint(point.x ,point.y ,$("#canvasId").val())
-            	})
-            }
-            //websocket connection
-            //connectAndSubscribe();
+        	initMap();
+        	document.addEventListener('DOMContentLoaded', function () {
+        		  if (document.querySelectorAll('#map').length > 0)
+        		  {
+        		    if (document.querySelector('html').lang)
+        		      lang = document.querySelector('html').lang;
+        		    else
+        		      lang = 'en';
+
+        		    var js_file = document.createElement('script');
+        		    js_file.type = 'text/javascript';
+        		    js_file.src = 'https://maps.googleapis.com/maps/api/js?callback=initMap&signed_in=true&language=' + lang;
+        		    document.getElementsByTagName('head')[0].appendChild(js_file);
+        		  }
+        		});
         },
     
     updateAirportList:updateAirportList

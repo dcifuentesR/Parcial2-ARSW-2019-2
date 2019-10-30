@@ -6,6 +6,6 @@ import edu.eci.arsw.airportfinder.model.Airport;
 
 public interface AirportFinderServices {
 	
-	public Set<Airport> getAirportsByName(String cityName) throws Exception;
+	public String getAirportsByName(String cityName) throws Exception;
 
 }
