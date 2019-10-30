@@ -26,20 +26,18 @@ public class AFServices implements AirportFinderServices {
 	@Autowired
 	private HttpConnectionServices httpCS;
 
-	public String getAirportsByName(String airportName) throws Exception{
-//		if(ap.getAirportsByName(airportName)==null) {
-//			JSONArray airports = (JSONArray) new JSONParser().parse(httpCS.getAirportsByName(airportName).getBody());
-//			Iterator itr = airports.iterator();
-//			while(itr.hasNext()) {
-//				
-//			}
-			
-			
-			
-			return httpCS.getAirportsByName(airportName).getBody();
-//		}else {
-//			//return ap.getAirportsByName(airportName);
-//		}
+	public Set<Airport> getAirportsByName(String airportName) throws Exception{
+		if(ap.getAirportsByName(airportName)==null) {
+			JSONArray airports = (JSONArray) new JSONParser().parse(httpCS.getAirportsByName(airportName).getBody());
+			for(Object o:airports) {
+				JSONObject oj = (JSONObject) o; 
+				Set<Airport> aports= new HashSet<Airport>();
+				aports.add(new Airport((String)oj.get("code"),(String) oj.get("name"), (String)oj.get("city"),(String) oj.get("countryCode")));
+			}	
+		}
+
+		return ap.getAirportsByName(airportName);
 	}
+		
 
 }
